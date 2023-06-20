@@ -20,3 +20,22 @@ app.get('/api/notes', (req, res) => {
     });
 });
 
+const { v4: uuidv4 } = require('uuid');
+
+app.post('/api/notes', (req, res) => {
+    const newNote = req.body;
+    newNote.id = uuidv4();
+
+    fs.readFile(path.join(__dirname, '/db/db.json'), 'utf8', (err, data) => {
+        if (err) throw err;
+        const notes = JSON.parse(data);
+        notes.push(newNote);
+        fs.writeFile(path.join(__dirname, '/db/db.json'), JSON.stringify(notes, null, 2), (err) => {
+            if (err) throw err;
+            res.status(200).send();
+        });
+    });
+});
+
+app.listen(PORT, () => console.log(`App listening on PORT: ${PORT}`));
+
