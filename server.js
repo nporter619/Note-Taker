@@ -36,6 +36,24 @@ app.post('/api/notes', (req, res) => {
     });
 });
 
+app.delete('/api/notes/:id', (req, res) => {
+    const noteId = req.params.id;
+
+    fs.readFile(path.join(__dirname, '/db/db.json'), 'utf8', (err, data) => {
+        if (err) throw err;
+        let notes = JSON.parse(data);
+
+        // Filter out the note with the given id
+        notes = notes.filter(note => note.id !== noteId);
+
+        // Write the filtered notes back to db.json
+        fs.writeFile(path.join(__dirname, '/db/db.json'), JSON.stringify(notes, null, 2), (err) => {
+            if (err) throw err;
+            res.status(200).send();
+        });
+    });
+});
+
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, '/public/index.html')));
 
 app.listen(PORT, () => console.log(`App listening on PORT: ${PORT}`));
